@@ -18,6 +18,7 @@ type innerDriver struct {
 
 type innerStmt struct {
 	c *innerConn
+	stmt interface{}
 	q string
 }
 
@@ -43,9 +44,13 @@ func (inD *innerDriver) Open(dsn string) (driver.Conn, error) {
 
 // implementation of database/sql/driver.Conn
 func (inC *innerConn) Prepare(query string) (driver.Stmt, error) {
-	stmt := &innerStmt{inC, query}
-	runtime.SetFinalizer(stmt, (*innerStmt).Close)
-	return stmt, nil
+	if s, err := inC.wrapper.Prepare(inC.conn, query); err != nil {
+		return nil, err
+	} else {
+		stmt := &innerStmt{inC, s, query}
+		runtime.SetFinalizer(stmt, (*innerStmt).Close)
+		return stmt, nil
+	}
 }
 
 func (inC *innerConn) Close() error {
@@ -73,7 +78,7 @@ func (inC *innerConn) Ping(ctx context.Context) (err error) {
 
 // implementation of database/sql/driver.Stmt
 func (inStmt *innerStmt) Close() error {
-	return nil
+	return inStmt.c.wrapper.CloseStmt(inStmt.stmt)
 }
 
 func (inStmt *innerStmt) NumInput() int {
@@ -88,7 +93,7 @@ func (inStmt *innerStmt) Exec(args []driver.Value) (driver.Result, error) {
 			as[i] = arg
 		}
 	}
-	r, e := inStmt.c.wrapper.Exec(inStmt.c.conn, inStmt.q, as...)
+	r, e := inStmt.c.wrapper.Exec(inStmt.stmt, inStmt.q, as...)
 	return driver.Result(r), e
 }
 
@@ -100,7 +105,7 @@ func (inStmt *innerStmt) Query(args []driver.Value) (driver.Rows, error) {
 			as[i] = arg
 		}
 	}
-	r, e := inStmt.c.wrapper.Query(inStmt.c.conn, inStmt.q, as...)
+	r, e := inStmt.c.wrapper.Query(inStmt.stmt, inStmt.q, as...)
 	return wrapperRows(r), e
 }
 

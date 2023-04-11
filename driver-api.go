@@ -23,8 +23,10 @@ type DriverWrapper interface {
 	BeginTx(conn interface{}) (interface{}, error)
 	Commit(tx interface{}) error
 	Rollback(tx interface{}) error
-	Exec(conn interface{}, sql string, args ...interface{}) (ExecResult, error)
-	Query(conn interface{}, sql string, args ...interface{}) (ResultSet, error)
+	Prepare(conn interface{}, query string) (interface{}, error)
+	CloseStmt(stmt interface{}) (error)
+	Exec(stmt interface{}, sql string, args ...interface{}) (ExecResult, error)
+	Query(stmt interface{}, sql string, args ...interface{}) (ResultSet, error)
 }
 
 func Register(wrapper DriverWrapper) {

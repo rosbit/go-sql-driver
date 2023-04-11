@@ -93,7 +93,7 @@ func (inStmt *innerStmt) Exec(args []driver.Value) (driver.Result, error) {
 			as[i] = arg
 		}
 	}
-	r, e := inStmt.c.wrapper.Exec(inStmt.stmt, inStmt.q, as...)
+	r, e := inStmt.c.wrapper.Exec(inStmt.stmt, as...)
 	return driver.Result(r), e
 }
 
@@ -105,7 +105,7 @@ func (inStmt *innerStmt) Query(args []driver.Value) (driver.Rows, error) {
 			as[i] = arg
 		}
 	}
-	r, e := inStmt.c.wrapper.Query(inStmt.stmt, inStmt.q, as...)
+	r, e := inStmt.c.wrapper.Query(inStmt.stmt, as...)
 	return wrapperRows(r), e
 }
 

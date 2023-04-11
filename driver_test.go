@@ -105,7 +105,7 @@ func (d *TDriver) Rollback(tx interface{}) error {
 }
 
 func (d *TDriver) Prepare(conn interface{}, query string) (interface{}, error) {
-	fmt.Printf("Prepare called\n")
+	fmt.Printf("Prepare %s called\n", query)
 	return nil, nil
 }
 
@@ -114,13 +114,13 @@ func (d *TDriver) CloseStmt(stmt interface{}) error {
 	return nil
 }
 
-func (d *TDriver) Exec(stmt interface{}, sql string, args ...interface{}) (ExecResult, error) {
-	fmt.Printf("exec: %s called\n", sql)
+func (d *TDriver) Exec(stmt interface{}, args ...interface{}) (ExecResult, error) {
+	fmt.Printf("exec called\n")
 	return &TResult{}, nil
 }
 
-func (d *TDriver) Query(stmt interface{}, sql string, args ...interface{}) (ResultSet, error) {
-	fmt.Printf("query: %s called\n", sql)
+func (d *TDriver) Query(stmt interface{}, args ...interface{}) (ResultSet, error) {
+	fmt.Printf("query called\n")
 	return &TResultSet{3}, nil
 }
 
@@ -140,15 +140,15 @@ func Test_driverRunning(t *testing.T) {
 	}
 	defer conn.Close()
 
+	/*
 	stmt, err := conn.Prepare("test query")
 	if err != nil {
 		t.Fatalf("failed to prepare: %v\n", err)
 	}
 	defer stmt.Close()
 	rows, err := stmt.Query("any-args-is-ok", 1, true)
-	/*
-	rows, err := conn.Query("test query", "any-args-is-ok", 1, true)
 	*/
+	rows, err := conn.Query("test query", "any-args-is-ok", 1, true)
 	if err != nil {
 		t.Fatalf("failed to query: %v\n", err)
 	}

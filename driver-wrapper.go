@@ -38,7 +38,7 @@ func (inD *innerDriver) Open(dsn string) (driver.Conn, error) {
 	} else {
 		c := &innerConn{conn, inD.wrapper}
 		runtime.SetFinalizer(c, (*innerConn).Close)
-		return &innerConn{conn, inD.wrapper}, nil
+		return c, nil
 	}
 }
 
@@ -55,7 +55,7 @@ func (inC *innerConn) Prepare(query string) (driver.Stmt, error) {
 
 func (inC *innerConn) Close() error {
 	err := inC.wrapper.CloseConnection(inC.conn)
-	runtime.SetFinalizer(inC, nil)
+	// runtime.SetFinalizer(inC, nil)
 	return err
 }
 
@@ -94,7 +94,7 @@ func (inStmt *innerStmt) Exec(args []driver.Value) (driver.Result, error) {
 		}
 	}
 	r, e := inStmt.c.wrapper.Exec(inStmt.stmt, as...)
-	return driver.Result(r), e
+	return r, e
 }
 
 func (inStmt *innerStmt) Query(args []driver.Value) (driver.Rows, error) {

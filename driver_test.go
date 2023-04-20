@@ -1,10 +1,11 @@
 package sqldriver
 
 import (
+	"database/sql/driver"
+	"database/sql"
 	"fmt"
 	"io"
 	"testing"
-	"database/sql"
 	//"github.com/go-xorm/xorm"
 	//"github.com/go-xorm/core"
 )
@@ -89,7 +90,7 @@ func (d *TDriver) Ping(conn interface{}) error {
 	return nil
 }
 
-func (d *TDriver) BeginTx(conn interface{}) (interface{}, error) {
+func (d *TDriver) BeginTx(conn interface{}, opts driver.TxOptions) (interface{}, error) {
 	fmt.Printf("BeginTx called\n")
 	return nil, nil
 }

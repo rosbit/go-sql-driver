@@ -60,15 +60,15 @@ func (inC *innerConn) Close() error {
 }
 
 func (inC *innerConn) Begin() (driver.Tx, error) {
-	if tx, err := inC.wrapper.BeginTx(inC.conn); err != nil {
+	return inC.BeginTx(context.Background(), driver.TxOptions{})
+}
+
+func (inC *innerConn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, error) {
+	if tx, err := inC.wrapper.BeginTx(inC.conn, opts); err != nil {
 		return nil, err
 	} else {
 		return &innerTx{tx, inC}, nil
 	}
-}
-
-func (inC *innerConn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, error) {
-	return inC.Begin()
 }
 
 // implementation of dabase/sql/driver.Pinger

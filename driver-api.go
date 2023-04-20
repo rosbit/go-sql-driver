@@ -1,6 +1,7 @@
 package sqldriver
 
 import (
+	"database/sql/driver"
 	"database/sql"
 )
 
@@ -20,7 +21,7 @@ type DriverWrapper interface {
 	CreateConnection(dsn string) (interface{}, error)
 	CloseConnection(conn interface{}) error
 	Ping(conn interface{}) error
-	BeginTx(conn interface{}) (interface{}, error)
+	BeginTx(conn interface{}, opts driver.TxOptions) (interface{}, error)
 	Commit(tx interface{}) error
 	Rollback(tx interface{}) error
 	Prepare(conn interface{}, query string) (interface{}, error)
